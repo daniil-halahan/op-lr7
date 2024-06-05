@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace lr8
+namespace lr7
 {
     class Program
     {
