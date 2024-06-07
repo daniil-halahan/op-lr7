@@ -4,104 +4,227 @@ namespace lr7
 {
     class Program
     {
-        public class GraphColoring
+        public class Node
         {
-            public int verticesCount;
-            private List<int>[] adjacencyList;
+            public int Data;
+            public Node Next;
 
-            public GraphColoring(int verticesCount)
+            public Node(int data)
             {
-                this.verticesCount = verticesCount;
-                adjacencyList = new List<int>[verticesCount];
-                for (int i = 0; i < verticesCount; i++)
-                    adjacencyList[i] = new List<int>();
-            }
-            public void AddEdge(int v1, int v2)
-            {
-                adjacencyList[v1].Add(v2);
-                adjacencyList[v2].Add(v1);
-            }
-            private bool IsColoreable(int vertex, int[] color, int currentColor)
-            {
-                foreach (var adj in adjacencyList[vertex])
-                {
-                    if (color[adj] == currentColor)
-                        return false;
-                }
-                return true;
-            }
-            public bool GraphColoringMethod(int m, int[] color, int vertex)
-            {
-                if (vertex == verticesCount)
-                    return true;
-
-                for (int c = 1; c <= m; c++)
-                {
-                    if (IsColoreable(vertex, color, c))
-                    {
-                        color[vertex] = c;
-                        if (GraphColoringMethod(m, color, vertex + 1))
-                            return true;
-                        color[vertex] = 0;
-                    }
-                }
-                return false;
-            }
-            public int ChromaticNumber()
-            {
-                int[] color = new int[verticesCount];
-                int m = 1;
-
-                while (!GraphColoringMethod(m, color, 0))
-                    m++;
-
-                return m;
+                Data = data;
+                Next = null;
             }
         }
 
+        public class SinglLinkedList
+        {
+            private Node head;
+
+            public SinglLinkedList()
+            {
+                head = null;
+            }
+
+            public void Add(int data)
+            {
+                Node newNode = new Node(data);
+                if (head == null)
+                {
+                    head = newNode;
+                }
+                else
+                {
+                    newNode.Next = head.Next;
+                    head.Next = newNode;
+                }
+            }
+
+            public void AddLast(int data)
+            {
+                Node newNode = new Node(data);
+                if (head == null)
+                {
+                    head = newNode;
+                }
+                else
+                {
+                    Node current = head;
+                    while (current.Next != null)
+                    {
+                        current = current.Next;
+                    }
+                    current.Next = newNode;
+                }
+            }
+
+            /*public int this[int index]
+            {
+                get
+                {
+                    Node current = head;
+                    int curIndex = 0;
+                    while (current != null)
+                    {
+                        if (curIndex == index)
+                        {
+                            return current.Data;
+                        }
+                        curIndex++;
+                        current = current.Next;
+                    }
+                    throw new IndexOutOfRangeException("Index out of range");
+                }
+                set
+                {
+                    Node current = head;
+                    int curIndex = 0;
+                    while (current != null)
+                    {
+                        if (curIndex == index)
+                        {
+                            current.Data = value;
+                            return;
+                        }
+                        curIndex++;
+                        current = current.Next;
+                    }
+                    throw new IndexOutOfRangeException("Index out of range");
+                }
+            }*/
+
+            public int FindFirstOccurrence(int value)
+            {
+                Node current = head;
+                int position = 1;
+                while (current != null)
+                {
+                    if (current.Data == value)
+                        return position;
+                    current = current.Next;
+                    position++;
+                }
+                return 0;
+            }
+
+            public int CountEvenMultiplesAtEvenPositions()
+            {
+                Node current = head;
+                int position = 1;
+                int count = 0;
+                while (current != null)
+                {
+                    if (position % 2 == 0 && current.Data % 2 == 0)
+                    {
+                        count++;
+                    }
+                    current = current.Next;
+                    position++;
+                }
+                return count;
+            }
+
+            public SinglLinkedList GetListUpToMinElement()
+            {
+                SinglLinkedList result = new SinglLinkedList();
+                Node current = head;
+                Node minNode = head;
+                int minValue = head.Data;
+
+                while (current != null)
+                {
+                    if (current.Data < minValue)
+                    {
+                        minValue = current.Data;
+                        minNode = current;
+                    }
+                    current = current.Next;
+                }
+
+                current = head;
+                while (current != null && current != minNode)
+                {
+                    result.AddLast(current.Data);
+                    current = current.Next;
+                }
+                return result;
+            }
+
+            public void RemoveAfterMinElement()
+            {
+                if (head == null) return;
+
+                Node current = head;
+                Node minNode = head;
+                int minValue = head.Data;
+
+                while (current != null)
+                {
+                    if (current.Data < minValue)
+                    {
+                        minValue = current.Data;
+                        minNode = current;
+                    }
+                    current = current.Next;
+                }
+
+                if (minNode != null)
+                    minNode.Next = null;
+            }
+
+            public void Print()
+            {
+                Node current = head;
+                while (current != null)
+                {
+                    Console.Write(current.Data + " ");
+                    current = current.Next;
+                }
+                Console.WriteLine();
+            }
+        }
         static void Main(string[] args)
         {
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
+            Console.OutputEncoding = Encoding.UTF8;
 
-            GraphColoring graph = new GraphColoring(15);
+            Console.Write("Введіть елементи для додавання у список: ");
+            string[] elements = Console.ReadLine().Split();
+            SinglLinkedList list = new SinglLinkedList();
+            foreach (string element in elements)
+                list.Add(int.Parse(element));
 
-            string[] cities = { "Algiers", "Blida", "Boumerdès", "Tizi Ouzou", "Médéa",
-                                "Tipaza", "Aïn Defla", "Chlef", "Bouira", "Djelfa",
-                                "M'Sila", "Tiaret", "Tlemcen", "Oran", "Sidi Bel Abbès",};
-            graph.AddEdge(0, 1); // Algiers - Blida
-            graph.AddEdge(0, 2); // Algiers - Boumerdès
-            graph.AddEdge(1, 2); // Blida - Boumerdès
-            graph.AddEdge(1, 4); // Blida - Médéa
-            graph.AddEdge(1, 5); // Blida - Tipaza
-            graph.AddEdge(1, 6); // Blida - Aïn Defla
-            graph.AddEdge(2, 3); // Boumerdès - Tizi Ouzou
-            graph.AddEdge(2, 8); // Boumerdès - Bouira
-            graph.AddEdge(3, 8); // Tizi Ouzou - Bouira
-            graph.AddEdge(4, 6); // Médéa - Aïn Defla
-            graph.AddEdge(4, 9); // Médéa - Djelfa
-            graph.AddEdge(4, 10); // Médéa - M'Sila
-            graph.AddEdge(5, 7); // Tipaza - Chlef
-            graph.AddEdge(6, 7); // Aïn Defla - Chlef
-            graph.AddEdge(7, 11); // Chlef - Tiaret
-            graph.AddEdge(8, 10); // Bouira - M'Sila
-            graph.AddEdge(9, 11); // Djelfa - Tiaret
-            graph.AddEdge(9, 10); // Djelfa - M'Sila
-            graph.AddEdge(10, 11); // M'Sila - Tiaret
-            graph.AddEdge(11, 14); // Tiaret - Sidi Bel Abbès
-            graph.AddEdge(12, 13); // Tlemcen - Oran
-            graph.AddEdge(12, 14); // Tlemcen - Sidi Bel Abbès
-            graph.AddEdge(13, 14); // Oran - Sidi Bel Abbès
+            Console.Write("Введений список: ");
+            list.Print();
 
-            int[] color = new int[graph.verticesCount];
-            int m = graph.ChromaticNumber();
-            graph.GraphColoringMethod(m, color, 0);
-            Console.WriteLine("Розфарбування:");
-            for (int i = 0; i < graph.verticesCount; i++)
+            Console.WriteLine("Операції зі списком:\n" +
+                              "1. Знайти перше входження заданого значення.\n" +
+                              "2. Знайти кількість елементів, кратних 2, які розташовані на парних позиціях.\n" +
+                              "3. Отримати новий список зі значень елементів, які розташовані до мінімального елементу.\n" +
+                              "4. Видалити елементи, які розташовані після мінімального елементу.");
+            switch (int.Parse(Console.ReadLine()))
             {
-                Console.WriteLine(cities[i] + $" - Колiр {color[i]}");
+                case 1:
+                    Console.Write("Введіть значення: ");
+                    int n = int.Parse(Console.ReadLine());
+                    Console.Write("Позиція першого входження заданого значення: " + list.FindFirstOccurrence(n));
+                    break;
+                case 2:
+                    Console.Write("Кількість елементів, кратних 2, які розташовані на парних позиціях: " + list.CountEvenMultiplesAtEvenPositions());
+                    break;
+                case 3:
+                    Console.Write("Cписок зі значень елементів, які розташовані до мінімального елементу: ");
+                    SinglLinkedList upToMin = list.GetListUpToMinElement();
+                    upToMin.Print();
+                    break;
+                case 4:
+                    list.RemoveAfterMinElement();
+                    Console.Write("Список з видаленими елементами, які розташовані після мінімального елементу: ");
+                    list.Print();
+                    break;
+                default:
+                    break;
             }
-            Console.WriteLine($"Хроматичне число: {m}");
         }
     }
 }
